@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathe-Prüfungs-Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1>Mathe-Prüfungs-Generator</h1>
+
+<label for="anzahl">Anzahl der Aufgaben:</label>
+<input type="number" id="anzahl" min="1" max="10" value="5">
+
+<label for="level">Schwierigkeitsgrad:</label>
+<select id="level">
+    <option value="leicht">Leicht</option>
+    <option value="mittel">Mittel</option>
+    <option value="schwer">Schwer</option>
+</select>
+
+<button onclick="startPruefung()">Starten</button>
+
+<div id="aktuellerContainer" class="container"></div>
+
+<h2>Gelöste Aufgaben:</h2>
+<div id="geloesteContainer" class="container"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
