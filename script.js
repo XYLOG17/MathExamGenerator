@@ -1,94 +1,151 @@
-let aufgaben = [];
-let aktuelleAufgabeIndex = 0;
-let aktuelleVersuche = 0;
+let tasks = [];
+let currentTaskIndex = 0;
+let currentAttempts = 0;
 
-function startPruefung() {
-    let anzahl = parseInt(document.getElementById("anzahl").value);
-    let level = document.getElementById("level").value;
+/**
+ * Starts the exam by generating tasks and displaying the first one.
+ */
+function startExam() {
+    let taskCount = parseInt(document.getElementById("taskCount").value);
+    let difficulty = document.getElementById("difficulty").value;
 
-    aufgaben = generiereAufgaben(anzahl, level);
-    aktuelleAufgabeIndex = 0;
-    aktuelleVersuche = 0;
+    tasks = generateTasks(taskCount, difficulty);
+    currentTaskIndex = 0;
+    currentAttempts = 0;
 
-    document.getElementById("geloesteContainer").innerHTML = "";
-    zeigeAktuelleAufgabe();
+    document.getElementById("solvedTasksContainer").innerHTML = "";
+    displayCurrentTask();
 }
 
-function generiereAufgaben(anzahl, level) {
-    let operationen, zahlenbereich;
+/**
+ * Generates random math tasks based on difficulty.
+ * @param {number} count - Number of tasks
+ * @param {string} difficulty - Task difficulty level
+ * @returns {Array} Array of task objects
+ */
+function generateTasks(count, difficulty) {
+    let operations, numberRange;
 
-    switch (level) {
-        case "leicht":
-            operationen = ["+", "-"];
-            zahlenbereich = 20;
+    switch (difficulty) {
+        case "easy":
+            operations = ["+", "-"];
+            numberRange = 20;
             break;
-        case "mittel":
-            operationen = ["+", "-", "*"];
-            zahlenbereich = 100;
+        case "medium":
+            operations = ["+", "-", "*"];
+            numberRange = 100;
             break;
-        case "schwer":
-            operationen = ["+", "-", "*", "/"];
-            zahlenbereich = 1000;
+        case "hard":
+            operations = ["+", "-", "*", "/"];
+            numberRange = 1000;
             break;
     }
 
-    let aufgabenListe = [];
+    let taskList = [];
 
-    for (let i = 0; i < anzahl; i++) {
-        let zahl1 = Math.floor(Math.random() * zahlenbereich) + 1;
-        let zahl2 = Math.floor(Math.random() * zahlenbereich) + 1;
-        let operation = operationen[Math.floor(Math.random() * operationen.length)];
+    for (let i = 0; i < count; i++) {
+        let num1 = Math.floor(Math.random() * numberRange) + 1;
+        let num2 = Math.floor(Math.random() * numberRange) + 1;
+        let operation = operations[Math.floor(Math.random() * operations.length)];
 
-        if (operation === "/" && zahl1 % zahl2 !== 0) {
-            zahl1 = zahl2 * (Math.floor(Math.random() * (zahlenbereich / zahl2)) + 1);
+        if (operation === "/" && num1 % num2 !== 0) {
+            num1 = num2 * (Math.floor(Math.random() * (numberRange / num2)) + 1);
         }
 
-        let frage = `${zahl1} ${operation} ${zahl2} = `;
-        let loesung = eval(zahl1 + operation + zahl2);
+        let question = `${num1} ${operation} ${num2} = `;
+        let solution = eval(num1 + operation + num2);
 
-        aufgabenListe.push({ frage, loesung, level });
+        taskList.push({ question, solution, difficulty });
     }
 
-    return aufgabenListe;
+    return taskList;
 }
 
-function zeigeAktuelleAufgabe() {
-    if (aktuelleAufgabeIndex >= aufgaben.length) {
-        document.getElementById("aktuellerContainer").innerHTML = "<h3>Alle Aufgaben gelöst!</h3>";
+/**
+ * Displays the current task or a message when all tasks are solved.
+ */
+function displayCurrentTask() {
+    if (currentTaskIndex >= tasks.length) {
+        document.getElementById("currentTaskContainer").innerHTML = "<h3>All tasks completed!</h3>";
         return;
     }
 
-    let aktuelleAufgabe = aufgaben[aktuelleAufgabeIndex];
-    document.getElementById("aktuellerContainer").innerHTML = `
-        <h3>Aufgabe ${aktuelleAufgabeIndex + 1}:</h3>
-        <p>${aktuelleAufgabe.frage}</p>
-        <input type="number" id="antwort" placeholder="Antwort eingeben">
-        <button onclick="pruefeAntwort()">Bestätigen</button>
+    let currentTask = tasks[currentTaskIndex];
+    document.getElementById("currentTaskContainer").innerHTML = `
+        <h3>Task ${currentTaskIndex + 1}:</h3>
+        <p>${currentTask.question}</p>
+        <input type="number" id="answer" placeholder="Enter answer">
+        <button class="button" onclick="checkAnswer()">Confirm</button>
+
         <p id="feedback"></p>
     `;
 }
 
-function pruefeAntwort() {
-    let aktuelleAufgabe = aufgaben[aktuelleAufgabeIndex];
-    let nutzerAntwort = parseFloat(document.getElementById("antwort").value);
+/**
+ * Checks if the user's answer is correct.
+ */
+function checkAnswer() {
+    let currentTask = tasks[currentTaskIndex];
+    let userAnswer = parseFloat(document.getElementById("answer").value);
     let feedback = document.getElementById("feedback");
 
-    aktuelleVersuche++;
+    currentAttempts++;
 
-    if (nutzerAntwort === aktuelleAufgabe.loesung) {
-        feedback.innerHTML = "<span style='color: green;'>Richtig!</span>";
-        speichereGeloesteAufgabe(aktuelleAufgabe, aktuelleVersuche);
-        aktuelleAufgabeIndex++;
-        aktuelleVersuche = 0;
-        setTimeout(zeigeAktuelleAufgabe, 1000);
+    if (userAnswer === currentTask.solution) {
+        feedback.innerHTML = "<span style='color: green;'>Correct!</span>";
+        storeSolvedTask(currentTask, currentAttempts);
+        currentTaskIndex++;
+        currentAttempts = 0;
+        setTimeout(displayCurrentTask, 1000);
     } else {
-        feedback.innerHTML = "<span style='color: red;'>Falsch! Versuche es noch einmal.</span>";
+        feedback.innerHTML = "<span style='color: red;'>Wrong! Try again.</span>";
+    }
+
+}
+
+/**
+ * Stores solved tasks in the solved tasks container.
+ * @param {Object} task - The solved task
+ * @param {number} attempts - Number of attempts taken
+ */
+function storeSolvedTask(task, attempts) {
+    let solvedTasksContainer = document.getElementById("solvedTasksContainer");
+    let p = document.createElement("p");
+    p.innerHTML = `✅ ${task.question} ${task.solution} (Difficulty: ${task.difficulty}, Attempts: ${attempts})`;
+    solvedTasksContainer.appendChild(p);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            let answerInput = document.getElementById("answer");
+            if (answerInput && document.activeElement === answerInput) {
+                checkAnswer();
+            }
+        }
+    });
+});
+
+function displayCurrentTask() {
+    if (currentTaskIndex >= tasks.length) {
+        document.getElementById("currentTaskContainer").innerHTML = "<h3>All tasks completed!</h3>";
+        return;
+    }
+
+    let currentTask = tasks[currentTaskIndex];
+    document.getElementById("currentTaskContainer").innerHTML = `
+        <h3>Task ${currentTaskIndex + 1}:</h3>
+        <p>${currentTask.question}</p>
+        <input type="number" id="answer" placeholder="Enter answer">
+        <button class="button" onclick="checkAnswer()">Confirm</button>
+        <p id="feedback"></p>
+    `;
+
+    // Direktes Fokussieren des Eingabefeldes
+    let answerInput = document.getElementById("answer");
+    if (answerInput) {
+        answerInput.focus();
     }
 }
 
-function speichereGeloesteAufgabe(aufgabe, versuche) {
-    let geloesteContainer = document.getElementById("geloesteContainer");
-    let p = document.createElement("p");
-    p.innerHTML = `✅ ${aufgabe.frage} ${aufgabe.loesung} (Level: ${aufgabe.level}, Versuche: ${versuche})`;
-    geloesteContainer.appendChild(p);
-}
+

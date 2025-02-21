@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background-color: #f4f4f4;
+    background: lightblue;
 }
 
 h1, h2 {
@@ -9,19 +9,48 @@ h1, h2 {
 }
 
 .container {
-    margin-top: 20px;
-    padding: 10px;
+    margin: 20px auto;
+    padding: 20px;
     background: white;
+    border: 2px solid #333;
     border-radius: 5px;
-    display: inline-block;
+    width: fit-content;
     text-align: left;
+}
+
+#settings-container, #task-container, #solved-container {
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 5px;
+    width: fit-content;
 }
 
 label, input, select, button {
     margin: 10px;
 }
 
-button {
+.button {
     cursor: pointer;
-    padding: 8px;
+    width: 184px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125em;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+    background: #644dff;
+    border: 2px solid #4836bb;
+    border-radius: .75rem;
+    box-shadow: 0 8px 0 #4836bb;
+    transition: all .1s ease;
+}
+
+.button:active {
+    letter-spacing: 0px;
+    transform: translateY(8px);
+    box-shadow: 0 0 0 #654dff63;
 }
